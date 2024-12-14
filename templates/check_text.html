@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Two Texts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Font Awesome CDN for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Container for centered content */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            background-color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        /* Title */
+        .title {
+            font-size: 2.5em;
+            color: #4A90E2;
+            margin-bottom: 30px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        /* Form Styling */
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Textarea Styling */
+        .textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 1em;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+
+        .textarea:focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+            outline: none;
+        }
+
+        /* Button Styling */
+        .submit-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: white;
+            background-color: #4A90E2;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            animation: buttonPulse 1s infinite alternate;
+        }
+
+        .submit-btn:hover {
+            background-color: #357ABD;
+            transform: scale(1.05);
+        }
+/* Result Styling */
+.result {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #4A90E2;
+    position: relative;
+    width: 100%;
+    height: 50px;
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif; /* Add a modern font family */
+}
+
+/* Not Plagiarized Animation */
+.not-plagiarized-loop {
+    display: inline-block;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #28a745; /* Green color */
+    font-family: 'Poppins', sans-serif; /* Add a stylish, clean font */
+    letter-spacing: 1px; /* Adds some spacing for clarity */
+}
+
+/* Animations */
+@keyframes movePlagiarized {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .plagiarized-loop {
+            display: inline-block;
+            flex-direction: row;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: red;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 100vh;  
+            background-color: #4A90E2;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 100;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        .navbar li {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .navbar a {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2em;
+            padding: 12px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar a i {
+            margin-right: 10px; /* Space between icon and text */
+        }
+
+        .navbar a:hover {
+            background-color: #357ABD;
+            color: #fff;
+        }
+
+        .container {
+            margin-left: 220px;
+            padding: 20px;
+            width: calc(100% - 220px);
+        }
+
+       /* Similarity Score Styling */
+.similarity-info {
+    margin-top: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #4A90E2; /* Blue color for the text */
+    background: linear-gradient(45deg, #4A90E2, #50E3C2); /* Gradient background */
+    color: transparent; /* Makes the text background gradient visible */
+    -webkit-background-clip: text; /* Ensures the gradient is clipped to the text */
+    background-clip: text; /* Modern way of clipping background to text */
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/"><i class="fas fa-home"></i>Home</a></li>
+                <li><a href="/check_plagiarism_text"><i class="fas fa-file-alt"></i> Texts</a></li>
+                <li><a href="/check_plagiarism_database"><i class="fas fa-database"></i> Database</a></li>
+                <li><a href="/sign_in"><i class="fas fa-sign-in-alt"></i>Sign In</a></li>
+                <li><a href="/login"><i class="fas fa-user-circle"></i>Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="title">Compare Two Texts</h1>
+        <form action="/check_plagiarism_text" method="post" id="text-form" class="form">
+            <textarea name="text1" placeholder="Enter the first text" required class="textarea"></textarea>
+            <textarea name="text2" placeholder="Enter the second text" required class="textarea"></textarea>
+            <button type="submit" class="submit-btn">Compare</button>
+        </form>
+        <!-- Add this inside the <div id="result" class="result"> container -->
+            <div id="similarity-info" class="similarity-info"></div>
+            <div id="plagiarized-loop"></div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+
+   document.getElementById("text-form").onsubmit = async function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const response = await fetch("/check_plagiarism_text", { method: "POST", body: formData });
+    const result = await response.json();
+    
+    const resultDiv = document.getElementById("result");
+    const similarityInfoDiv = document.getElementById("similarity-info");
+
+    // Round the similarity score to 2 decimal places
+    const roundedSimilarityScore = result.similarity_score.toFixed(2);
+
+    // Add the rounded similarity score with the unique styling
+    similarityInfoDiv.innerHTML = `Similarity Score: <span class="similarity-score">${roundedSimilarityScore}</span>`;
+
+    // Clear previous content and add new result message
+    resultDiv.innerHTML = ''; 
+
+
+    if (result.similarity_score > 0.85) {
+        resultDiv.innerHTML = '<div class="plagiarized-loop">Plagiarized </div>';
+    } else {
+        resultDiv.innerHTML = '<div class="not-plagiarized-loop">Not Plagiarized</div>';
+    }
+};
+
+
+    </script>
+</body>
+</html>
